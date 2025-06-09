@@ -1,0 +1,60 @@
+<!-- login.component.html - Pure Bootstrap 5 -->
+<div class="container-fluid">
+  <form (ngSubmit)="login()">
+
+    <div class="mb-3">
+      <label for="email" class="form-label fw-medium">Email:</label>
+      <input type="email"
+             id="email"
+             [(ngModel)]="email"
+             name="email"
+             required
+             class="form-control"
+             placeholder="Enter your email">
+    </div>
+
+    <div class="mb-3">
+      <label for="password" class="form-label fw-medium">Password:</label>
+      <input type="password"
+             id="password"
+             [(ngModel)]="password"
+             name="password"
+             autocomplete="current-password"
+             required
+             class="form-control"
+             placeholder="Enter your password">
+    </div>
+
+    <button type="submit"
+            class="btn btn-success w-100 d-flex align-items-center justify-content-center"
+            [disabled]="loading">
+      <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+      <span *ngIf="!loading" class="me-2">🔑</span>
+      {{ loading ? 'Logging in...' : 'Login' }}
+    </button>
+
+  </form>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="alert alert-danger mt-3">
+    <i class="fas fa-exclamation-circle me-2"></i>
+    {{ errorMessage }}
+  </div>
+
+  <!-- Auth Links -->
+  <div class="text-center mt-3">
+    <p class="text-muted mb-2">
+      Don't have an account?
+      <a href="#" class="text-decoration-none fw-medium" (click)="onSwitchToRegister()">
+        Register here
+      </a>
+    </p>
+
+    <p class="text-muted">
+      <a href="#" class="text-decoration-none fw-medium" (click)="onForgotPassword()">
+        Forgot Password?
+      </a>
+    </p>
+  </div>
+
+</div>

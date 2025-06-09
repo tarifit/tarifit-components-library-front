@@ -1,0 +1,237 @@
+<div class="unified-search-page-container">
+  <div class="container-xl py-5 px-4">
+    <div class="content-wrapper">
+      <div class="unified-search-container">
+        <!-- Search Header -->
+        <div class="search-header">
+          <h2>🔍 Unified Dictionary Search</h2>
+          <p class="subtitle">Search across Aqelɛi and Waryaghri collections</p>
+        </div>
+
+        <!-- Search Controls -->
+        <div class="search-controls">
+          <div class="search-input-container">
+            <input 
+              type="text" 
+              [(ngModel)]="searchTerm"
+              (keypress)="onSearchKeypress($event)"
+              placeholder="Search for words, translations, or meanings..."
+              class="search-input"
+              [disabled]="loading">
+            
+            <button 
+              (click)="clearSearch()" 
+              class="clear-btn"
+              *ngIf="searchTerm"
+              title="Clear search">
+              ✕
+            </button>
+          </div>
+
+          <div class="search-actions">
+            <button 
+              (click)="performSearch()" 
+              class="btn btn-primary"
+              [disabled]="loading || !searchTerm.trim()"
+              title="Search dictionaries">
+              🔍 Search
+            </button>
+            
+            <button 
+              (click)="getRandomEntry()" 
+              class="btn btn-secondary"
+              [disabled]="loading || !hasActiveSource()"
+              title="Get random entry">
+              🎲 Random
+            </button>
+            
+            <button 
+              (click)="toggleFilters()" 
+              class="btn btn-outline"
+              [class.active]="showFilters">
+              ⚙️ Filters
+            </button>
+          </div>
+        </div>
+
+        <!-- Filters Panel -->
+        <div class="filters-panel" *ngIf="showFilters">
+          <h4>Dictionary Sources</h4>
+          <div class="source-filters">
+            <label class="filter-checkbox">
+              <input 
+                type="checkbox" 
+                [(ngModel)]="sources.AQELEI"
+                (change)="onSourceFilterChange()">
+              <span class="checkmark"></span>
+              <span class="filter-label">
+                <span class="badge badge-aqelei">Aqelɛi</span>
+                <small *ngIf="statistics">({{statistics.entriesBySource['Aqelɛi'] || 0}} entries)</small>
+              </span>
+            </label>
+            
+            <label class="filter-checkbox">
+              <input 
+                type="checkbox" 
+                [(ngModel)]="sources.WARYAGHRI"
+                (change)="onSourceFilterChange()">
+              <span class="checkmark"></span>
+              <span class="filter-label">
+                <span class="badge badge-waryaghri">Waryaghri</span>
+                <small *ngIf="statistics">({{statistics.entriesBySource['Waryaghri'] || 0}} entries)</small>
+              </span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Results Summary -->
+        <div class="results-summary" *ngIf="hasSearched || loading">
+          <p>{{ getResultsSummary() }}</p>
+          <div class="loading-spinner" *ngIf="loading"></div>
+        </div>
+
+        <!-- Search Results -->
+        <div class="search-results" *ngIf="searchResults.length > 0 && !loading">
+          <div 
+            class="result-item"
+            *ngFor="let result of searchResults; trackBy: trackByGlobalId"
+            (click)="selectResult(result)"
+            [class.selected]="selectedResult?.globalId === result.globalId">
+            
+            <!-- Source Badge -->
+            <div class="result-header">
+              <span class="source-badge" [ngClass]="getSourceBadgeClass(result.source)">
+                {{ result.sourceDisplayName }}
+              </span>
+              <span class="relevance-score" *ngIf="result.relevanceScore < 10">
+                Score: {{ result.relevanceScore }}
+              </span>
+              <button 
+                *ngIf="isAuthenticated"
+                class="favorite-btn"
+                (click)="toggleFavorite(result, $event)"
+                [class.favorited]="favoriteStatus[result.globalId]"
+                [title]="favoriteStatus[result.globalId] ? 'Remove from favorites' : 'Add to favorites'">
+                {{ favoriteStatus[result.globalId] ? '⭐' : '☆' }}
+              </button>
+            </div>
+
+            <!-- Main Content -->
+            <div class="result-content">
+              <div class="word-translation">
+                <strong class="word">{{ result.word }}</strong>
+                <span class="separator">→</span>
+                <span class="translation">{{ result.translation }}</span>
+              </div>
+              
+              <div class="result-meta">
+                <span class="type-badge">{{ result.type }}</span>
+                <span class="match-type">{{ getMatchTypeDisplay(result.matchType) }}</span>
+              </div>
+            </div>
+
+            <!-- Expand indicator -->
+            <div class="expand-indicator">
+              <span class="expand-icon">▶</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- No Results -->
+        <div class="no-results" *ngIf="hasSearched && searchResults.length === 0 && !loading">
+          <div class="no-results-content">
+            <p>🔍 No results found for "<strong>{{ searchTerm }}</strong>"</p>
+            <div class="suggestions">
+              <p>Try:</p>
+              <ul>
+                <li>Checking your spelling</li>
+                <li>Using different keywords</li>
+                <li>Searching in a different script (Latin/Tifinagh)</li>
+                <li>Enabling more dictionary sources</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- Welcome State -->
+        <div class="welcome-state" *ngIf="!hasSearched && !loading">
+          <div class="welcome-content">
+            <h3>🌟 Welcome to Unified Search</h3>
+            <p>Search across multiple Tarifit dictionary collections simultaneously</p>
+            
+            <div class="features" *ngIf="statistics">
+              <div class="feature-card">
+                <h4>📚 Total Entries</h4>
+                <p class="big-number">{{ getTotalDictionaryEntries() }}</p>
+              </div>
+              
+              <div class="feature-card" *ngFor="let source of getDictionarySourcesOnly()">
+                <h4>{{ source }}</h4>
+                <p class="big-number">{{ statistics.entriesBySource[source].toLocaleString() }}</p>
+              </div>
+            </div>
+
+            <div class="getting-started">
+              <p><strong>Getting started:</strong></p>
+              <ul>
+                <li>Type any word in Tarifit or French</li>
+                <li>Use the filters to search specific dictionaries</li>
+                <li>Click the star ⭐ to save favorites</li>
+                <li>Try the random button 🎲 to discover new words</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Detailed View Modal -->
+<div class="modal-overlay" *ngIf="selectedResult" (click)="closeDetailView()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h3>{{ selectedResult.word }}</h3>
+      <button class="close-btn" (click)="closeDetailView()">✕</button>
+    </div>
+    
+    <div class="modal-body">
+      <div class="detail-source">
+        <span class="source-badge" [ngClass]="getSourceBadgeClass(selectedResult.source)">
+          {{ selectedResult.sourceDisplayName }}
+        </span>
+      </div>
+      
+      <div class="detail-content">
+        <div class="word-section">
+          <h4>Word</h4>
+          <p class="detail-word">{{ selectedResult.word }}</p>
+        </div>
+        
+        <div class="translation-section">
+          <h4>Translation</h4>
+          <p class="detail-translation">{{ selectedResult.translation }}</p>
+        </div>
+        
+        <div class="type-section">
+          <h4>Type</h4>
+          <span class="type-badge large">{{ selectedResult.type }}</span>
+        </div>
+        
+        <div class="match-section">
+          <h4>Match Information</h4>
+          <p>{{ getMatchTypeDisplay(selectedResult.matchType) }}</p>
+          <small>Relevance score: {{ selectedResult.relevanceScore }}</small>
+        </div>
+      </div>
+    </div>
+    
+    <div class="modal-footer" *ngIf="isAuthenticated">
+      <button 
+        class="btn btn-primary"
+        (click)="toggleFavorite(selectedResult, $event)">
+        {{ favoriteStatus[selectedResult.globalId] ? '⭐ Remove from Favorites' : '☆ Add to Favorites' }}
+      </button>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,538 @@
+<!-- Bootstrap 5 Navbar - Reorganized with Centered Navigation -->
+<nav class="navbar navbar-expand-lg bg-success shadow-lg sticky-top">
+  <div class="container-fluid px-4">
+
+    <!-- Brand - Left Side -->
+    <a class="navbar-brand text-white fw-bold fs-3 d-flex align-items-center text-decoration-none"
+       (click)="goHome()">
+      <span class="me-2 fs-2">🏔️</span>
+      <span class="text-white">Tarifit Translator</span>
+    </a>
+
+    <!-- Mobile Toggle Button -->
+    <button class="navbar-toggler border-0 text-white"
+            type="button"
+            (click)="toggleMobileMenu()"
+            [attr.aria-expanded]="mobileMenuOpen">
+      <i class="fas" [class.fa-bars]="!mobileMenuOpen" [class.fa-times]="mobileMenuOpen"></i>
+    </button>
+
+    <!-- Collapsible Content -->
+    <div class="collapse navbar-collapse" [class.show]="mobileMenuOpen">
+
+      <!-- Spacer to push navigation to center -->
+      <div class="navbar-nav me-auto d-none d-lg-block" style="width: 20px;"></div>
+
+      <!-- Centered Navigation Container -->
+      <div class="navbar-nav-centered mx-auto">
+        <ul class="navbar-nav d-flex flex-row flex-wrap justify-content-center">
+
+        <!-- Guest Mode Navigation -->
+        <ng-container *ngIf="!isUserAuthenticated">
+          <!-- Dictionaries Dropdown for Guests -->
+          <li class="nav-item dropdown">
+            <button class="btn btn-outline-light me-2 mb-2 mb-lg-0 d-flex align-items-center dropdown-toggle"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false">
+              <i class="fas fa-book me-2"></i>
+              Dictionaries
+            </button>
+            <ul class="dropdown-menu">
+              <li>
+                <button class="dropdown-item d-flex align-items-center"
+                        (click)="navigateGuest('unified-search')"
+                        [class.active]="isGuestPageActive('unified-search')">
+                  <i class="fas fa-search me-2"></i>
+                  Unified Search
+                  <span class="badge bg-info text-white ms-1">NEW</span>
+                </button>
+              </li>
+              <li><hr class="dropdown-divider"></li>
+              <li>
+                <button class="dropdown-item d-flex align-items-center"
+                        (click)="navigateGuest('dictionary')"
+                        [class.active]="isGuestPageActive('dictionary')">
+                  <i class="fas fa-book me-2"></i>
+                  Dictionary Waryaghri
+                </button>
+              </li>
+              <li>
+                <button class="dropdown-item d-flex align-items-center"
+                        (click)="navigateGuest('dictionary-aqelei')"
+                        [class.active]="isGuestPageActive('dictionary-aqelei')">
+                  <i class="fas fa-book-open me-2"></i>
+                  Dictionary Aqelɛi
+                </button>
+              </li>
+            </ul>
+          </li>
+
+          <!-- Translation Pairs Dropdown for Guests -->
+          <li class="nav-item dropdown">
+            <button class="btn btn-outline-light me-2 mb-2 mb-lg-0 d-flex align-items-center dropdown-toggle"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false">
+              <i class="fas fa-language me-2"></i>
+              Translation
+            </button>
+            <ul class="dropdown-menu">
+              <li>
+                <button class="dropdown-item d-flex align-items-center"
+                        (click)="navigateGuest('translation')"
+                        [class.active]="isGuestPageActive('translation')">
+                  <i class="fas fa-language me-2"></i>
+                  Tarifit ↔ English
+                  <span class="badge bg-warning text-dark ms-1">DISCOVER</span>
+                </button>
+              </li>
+              <li>
+                <button class="dropdown-item d-flex align-items-center"
+                        (click)="navigateGuest('french')"
+                        [class.active]="isGuestPageActive('french')">
+                  <i class="fas fa-globe-europe me-2"></i>
+                  Tarifit ↔ French
+                </button>
+              </li>
+              <li>
+                <button class="dropdown-item d-flex align-items-center"
+                        (click)="navigateGuest('darija')"
+                        [class.active]="isGuestPageActive('darija')">
+                  <i class="fas fa-comments me-2"></i>
+                  Tarifit ↔ Darija
+                </button>
+              </li>
+            </ul>
+          </li>
+
+          <li class="nav-item">
+            <button class="btn btn-outline-light me-2 mb-2 mb-lg-0 d-flex align-items-center"
+                    (click)="navigateGuest('conjugation')"
+                    [class.active]="isGuestPageActive('conjugation')">
+              <i class="fas fa-spell-check me-2"></i>
+              Conjugation
+            </button>
+          </li>
+
+          <li class="nav-item">
+            <button class="btn btn-outline-light me-2 mb-2 mb-lg-0 d-flex align-items-center"
+                    (click)="navigateGuest('massin')"
+                    [class.active]="isGuestPageActive('massin')">
+              <i class="fas fa-book-reader me-2"></i>
+              Massin
+              <span class="badge bg-warning text-dark ms-1">CULTURE</span>
+            </button>
+          </li>
+        </ng-container>
+
+        <!-- Authenticated User Navigation -->
+        <ng-container *ngIf="isUserAuthenticated">
+          
+          <!-- Dictionaries Dropdown -->
+          <li class="nav-item dropdown">
+            <button class="btn btn-outline-light me-2 mb-2 mb-lg-0 d-flex align-items-center dropdown-toggle"
+                    [class.btn-light]="isDictionaryActive()"
+                    [class.text-dark]="isDictionaryActive()"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false">
+              <i class="fas fa-book me-2"></i>
+              Dictionaries
+              <span *ngIf="isDictionaryActive()" class="ms-2">📚</span>
+            </button>
+            <ul class="dropdown-menu">
+              <li>
+                <button class="dropdown-item d-flex align-items-center"
+                        (click)="changeTab('unified-search')"
+                        [class.active]="selectedTab === 'unified-search'">
+                  <i class="fas fa-search me-2"></i>
+                  Unified Search
+                  <span class="badge bg-info text-white ms-1">NEW</span>
+                  <span *ngIf="selectedTab === 'unified-search'" class="ms-2">✨</span>
+                </button>
+              </li>
+              <li><hr class="dropdown-divider"></li>
+              <li>
+                <button class="dropdown-item d-flex align-items-center"
+                        (click)="changeTab('dictionary-waryaghri')"
+                        [class.active]="selectedTab === 'dictionary-waryaghri'">
+                  <i class="fas fa-book me-2"></i>
+                  Dictionary Waryaghri
+                  <span *ngIf="selectedTab === 'dictionary-waryaghri'" class="ms-2">🌿</span>
+                </button>
+              </li>
+              <li>
+                <button class="dropdown-item d-flex align-items-center"
+                        (click)="changeTab('dictionary-aqelei')"
+                        [class.active]="selectedTab === 'dictionary-aqelei'">
+                  <i class="fas fa-book-open me-2"></i>
+                  Dictionary Aqelɛi
+                  <span *ngIf="selectedTab === 'dictionary-aqelei'" class="ms-2">🌿</span>
+                </button>
+              </li>
+            </ul>
+          </li>
+
+          <!-- Translation Pairs Dropdown -->
+          <li class="nav-item dropdown">
+            <button class="btn btn-outline-light me-2 mb-2 mb-lg-0 d-flex align-items-center dropdown-toggle"
+                    [class.btn-light]="isTranslationActive()"
+                    [class.text-dark]="isTranslationActive()"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false">
+              <i class="fas fa-language me-2"></i>
+              Translation
+              <span *ngIf="isTranslationActive()" class="ms-2">🔄</span>
+            </button>
+            <ul class="dropdown-menu">
+              <li>
+                <button class="dropdown-item d-flex align-items-center"
+                        (click)="changeTab('tarifit-english')"
+                        [class.active]="selectedTab === 'tarifit-english'">
+                  <i class="fas fa-language me-2"></i>
+                  Tarifit ↔ English
+                  <span *ngIf="selectedTab === 'tarifit-english'" class="ms-2">🌿</span>
+                </button>
+              </li>
+              <li>
+                <button class="dropdown-item d-flex align-items-center"
+                        (click)="changeTab('tarifit-french')"
+                        [class.active]="selectedTab === 'tarifit-french'">
+                  <i class="fas fa-globe-europe me-2"></i>
+                  Tarifit ↔ French
+                  <span *ngIf="selectedTab === 'tarifit-french'" class="ms-2">🌿</span>
+                </button>
+              </li>
+              <li>
+                <button class="dropdown-item d-flex align-items-center"
+                        (click)="changeTab('tarifit-darija')"
+                        [class.active]="selectedTab === 'tarifit-darija'">
+                  <i class="fas fa-comments me-2"></i>
+                  Tarifit ↔ Darija
+                  <span *ngIf="selectedTab === 'tarifit-darija'" class="ms-2">🌿</span>
+                </button>
+              </li>
+              <li><hr class="dropdown-divider"></li>
+              <li>
+                <button class="dropdown-item d-flex align-items-center"
+                        (click)="changeTab('massin')"
+                        [class.active]="selectedTab === 'massin'">
+                  <i class="fas fa-book-reader me-2"></i>
+                  Massin (Pairs Translated)
+                  <span class="badge bg-warning text-dark ms-1">CULTURE</span>
+                  <span *ngIf="selectedTab === 'massin'" class="ms-2">📚</span>
+                </button>
+              </li>
+            </ul>
+          </li>
+
+          <!-- Language Tools Dropdown -->
+          <li class="nav-item dropdown">
+            <button class="btn btn-outline-light me-2 mb-2 mb-lg-0 d-flex align-items-center dropdown-toggle"
+                    [class.btn-light]="isLanguageToolsActive()"
+                    [class.text-dark]="isLanguageToolsActive()"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false">
+              <i class="fas fa-tools me-2"></i>
+              Tools
+              <span *ngIf="isLanguageToolsActive()" class="ms-2">🔧</span>
+            </button>
+            <ul class="dropdown-menu">
+              <li>
+                <button class="dropdown-item d-flex align-items-center"
+                        (click)="changeTab('verbs')"
+                        [class.active]="selectedTab === 'verbs'">
+                  <i class="fas fa-spell-check me-2"></i>
+                  Verb Conjugation
+                  <span *ngIf="selectedTab === 'verbs'" class="ms-2">🌿</span>
+                </button>
+              </li>
+              <li>
+                <button class="dropdown-item d-flex align-items-center"
+                        (click)="changeTab('sentence-translation')"
+                        [class.active]="selectedTab === 'sentence-translation'">
+                  <i class="fas fa-exchange-alt me-2"></i>
+                  Sentence Translation
+                  <span class="badge bg-success text-white ms-1">PRACTICE</span>
+                  <span *ngIf="selectedTab === 'sentence-translation'" class="ms-2">🔄</span>
+                </button>
+              </li>
+              <li>
+                <button class="dropdown-item d-flex align-items-center"
+                        (click)="changeTab('word-relationships')"
+                        [class.active]="selectedTab === 'word-relationships'">
+                  <i class="fas fa-project-diagram me-2"></i>
+                  🔗 Word Relationships
+                  <span class="badge bg-info text-white ms-1">AI</span>
+                  <span *ngIf="selectedTab === 'word-relationships'" class="ms-2">🧠</span>
+                </button>
+              </li>
+            </ul>
+          </li>
+
+          <!-- Learning & Analytics Dropdown -->
+          <li class="nav-item dropdown">
+            <button class="btn btn-outline-light me-2 mb-2 mb-lg-0 d-flex align-items-center dropdown-toggle"
+                    [class.btn-light]="isLearningActive()"
+                    [class.text-dark]="isLearningActive()"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false">
+              <i class="fas fa-graduation-cap me-2"></i>
+              Learning
+              <span *ngIf="isLearningActive()" class="ms-2">🎓</span>
+            </button>
+            <ul class="dropdown-menu">
+              <li>
+                <button class="dropdown-item d-flex align-items-center"
+                        (click)="changeTab('learning')"
+                        [class.active]="selectedTab === 'learning'">
+                  <i class="fas fa-graduation-cap me-2"></i>
+                  📚 Learning Dashboard
+                  <span class="badge bg-success text-white ms-1">SMART</span>
+                  <span *ngIf="selectedTab === 'learning'" class="ms-2">🎓</span>
+                </button>
+              </li>
+              <li>
+                <button class="dropdown-item d-flex align-items-center"
+                        (click)="changeTab('personal-analytics')"
+                        [class.active]="selectedTab === 'personal-analytics'">
+                  <i class="fas fa-chart-bar me-2"></i>
+                  📊 My Analytics
+                  <span class="badge bg-info text-white ms-1">PERSONAL</span>
+                  <span *ngIf="selectedTab === 'personal-analytics'" class="ms-2">📈</span>
+                </button>
+              </li>
+              <!-- Admin Analytics (Only for Admins) -->
+              <li *ngIf="isAdmin">
+                <button class="dropdown-item d-flex align-items-center"
+                        (click)="changeTab('admin-analytics')"
+                        [class.active]="selectedTab === 'admin-analytics'">
+                  <i class="fas fa-chart-line me-2"></i>
+                  🔧 Admin Analytics
+                  <span class="badge bg-danger text-white ms-1">ADMIN</span>
+                  <span *ngIf="selectedTab === 'admin-analytics'" class="ms-2">👨‍💼</span>
+                </button>
+              </li>
+            </ul>
+          </li>
+
+          <!-- Community Dropdown -->
+          <li class="nav-item dropdown">
+            <button class="btn btn-outline-light me-2 mb-2 mb-lg-0 d-flex align-items-center dropdown-toggle"
+                    [class.btn-light]="isCommunityActive()"
+                    [class.text-dark]="isCommunityActive()"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false">
+              <i class="fas fa-users me-2"></i>
+              Community
+              <span *ngIf="isCommunityActive()" class="ms-2">👥</span>
+            </button>
+            <ul class="dropdown-menu">
+              <li>
+                <button class="dropdown-item d-flex align-items-center"
+                        (click)="changeTab('leaderboard')"
+                        [class.active]="selectedTab === 'leaderboard'">
+                  <i class="fas fa-trophy me-2"></i>
+                  Leaderboard
+                  <span *ngIf="selectedTab === 'leaderboard'" class="ms-2">🏆</span>
+                </button>
+              </li>
+              <li>
+                <button class="dropdown-item d-flex align-items-center"
+                        (click)="changeTab('verify-translations')"
+                        [class.active]="selectedTab === 'verify-translations'">
+                  <i class="fas fa-check-circle me-2"></i>
+                  Verify Translations
+                  <span *ngIf="selectedTab === 'verify-translations'" class="ms-2">🌿</span>
+                </button>
+              </li>
+            </ul>
+          </li>
+        </ng-container>
+        </ul>
+      </div>
+
+      <!-- Spacer to balance the layout -->
+      <div class="navbar-nav ms-auto d-none d-lg-block" style="width: 20px;"></div>
+
+      <!-- Right Side User Menu -->
+      <div class="navbar-nav ms-auto">
+        <div class="d-flex align-items-center">
+
+        <!-- Guest Actions -->
+        <ng-container *ngIf="!isUserAuthenticated">
+          <span class="badge bg-warning text-dark me-3 px-3 py-2">
+            🌲 NATURE EXPLORER 🌲
+          </span>
+
+          <button class="btn btn-outline-light me-2" (click)="login()">
+            <i class="fas fa-sign-in-alt me-1"></i>
+            Login
+          </button>
+
+          <button class="btn btn-light text-success fw-bold" (click)="register()">
+            <i class="fas fa-seedling me-1"></i>
+            Join Community
+          </button>
+        </ng-container>
+
+        <!-- Unified User Menu -->
+        <ng-container *ngIf="isUserAuthenticated">
+          <div class="dropdown">
+            <button class="btn btn-light text-success fw-bold d-flex align-items-center px-3 py-2 rounded-pill dropdown-toggle"
+                    type="button"
+                    data-bs-toggle="dropdown"
+                    aria-expanded="false">
+              <!-- User Avatar/Icon -->
+              <div class="bg-success rounded-circle d-flex align-items-center justify-content-center me-2" 
+                   style="width: 32px; height: 32px;">
+                <i class="fa fa-user text-white"></i>
+              </div>
+              
+              <!-- Points Display Inline -->
+              <div class="d-flex align-items-center me-2">
+                <span class="fw-bold text-success me-1">156</span>
+                <i class="fas fa-coins text-warning"></i>
+                <span class="badge bg-success text-white ms-1 rounded-pill">+156 today</span>
+              </div>
+              
+              <!-- Notification Indicator -->
+              <div class="position-relative me-1">
+                <i class="fas fa-bell text-success"></i>
+                <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" 
+                      style="font-size: 0.6em;">3</span>
+              </div>
+            </button>
+
+            <ul class="dropdown-menu dropdown-menu-end shadow border-0" style="min-width: 420px;">
+              <!-- User Info Header -->
+              <li class="dropdown-header bg-light px-3 py-2 border-bottom">
+                <div class="d-flex align-items-center">
+                  <div class="bg-success rounded-circle d-flex align-items-center justify-content-center me-3" 
+                       style="width: 40px; height: 40px;">
+                    <i class="fa fa-leaf text-white"></i>
+                  </div>
+                  <div>
+                    <div class="fw-bold text-success">Language Guardian</div>
+                    <small class="text-muted">Rank #344 • 156 points today</small>
+                  </div>
+                </div>
+              </li>
+
+              <!-- Quick Stats -->
+              <li class="px-3 py-2 bg-light border-bottom">
+                <div class="row text-center">
+                  <div class="col-4">
+                    <div class="fw-bold text-success">156</div>
+                    <small class="text-muted">Total Points</small>
+                  </div>
+                  <div class="col-4">
+                    <div class="fw-bold text-primary">344</div>
+                    <small class="text-muted">Rank</small>
+                  </div>
+                  <div class="col-4">
+                    <div class="fw-bold text-warning">12</div>
+                    <small class="text-muted">Streak</small>
+                  </div>
+                </div>
+              </li>
+
+              <!-- Notifications Section -->
+              <li class="dropdown-header px-3 py-2 d-flex justify-content-between align-items-center">
+                <span class="fw-medium">Recent Activity</span>
+                <span class="badge bg-danger rounded-pill">3</span>
+              </li>
+              <li>
+                <div class="px-3 py-2 notifications-scroll" style="max-height: 400px; overflow-y: auto;">
+                  <div class="d-flex align-items-center p-2 bg-light rounded notification-item">
+                    <i class="fas fa-trophy text-warning me-2"></i>
+                    <div class="small">
+                      <div class="fw-medium">New achievement unlocked!</div>
+                      <div class="text-muted">Earned "Word Explorer" badge</div>
+                    </div>
+                  </div>
+                  <div class="d-flex align-items-center p-2 bg-light rounded notification-item">
+                    <i class="fas fa-check-circle text-success me-2"></i>
+                    <div class="small">
+                      <div class="fw-medium">Translation verified</div>
+                      <div class="text-muted">+10 points earned</div>
+                    </div>
+                  </div>
+                  <div class="d-flex align-items-center p-2 bg-light rounded notification-item">
+                    <i class="fas fa-users text-info me-2"></i>
+                    <div class="small">
+                      <div class="fw-medium">Rank improved</div>
+                      <div class="text-muted">Moved up 5 positions</div>
+                    </div>
+                  </div>
+                </div>
+              </li>
+
+              <li><hr class="dropdown-divider"></li>
+
+              <!-- Main Menu Items -->
+              <li>
+                <button class="dropdown-item d-flex align-items-center py-2" (click)="goToProfile()">
+                  <i class="fa fa-user-circle me-3 text-primary"></i>
+                  <div>
+                    <div class="fw-medium">My Profile</div>
+                    <small class="text-muted">View progress & achievements</small>
+                  </div>
+                </button>
+              </li>
+              
+              <li>
+                <button class="dropdown-item d-flex align-items-center py-2" (click)="changeTab('personal-analytics')">
+                  <i class="fa fa-chart-line me-3 text-info"></i>
+                  <div>
+                    <div class="fw-medium">My Analytics</div>
+                    <small class="text-muted">Personal learning insights & stats</small>
+                  </div>
+                </button>
+              </li>
+
+              <li>
+                <button class="dropdown-item d-flex align-items-center py-2" (click)="changeTab('learning')">
+                  <i class="fa fa-graduation-cap me-3 text-success"></i>
+                  <div>
+                    <div class="fw-medium">Learning Dashboard</div>
+                    <small class="text-muted">Track your learning journey</small>
+                  </div>
+                </button>
+              </li>
+
+              <li>
+                <button class="dropdown-item d-flex align-items-center py-2" (click)="goToPreferences()">
+                  <i class="fa fa-cog me-3 text-secondary"></i>
+                  <div>
+                    <div class="fw-medium">Settings</div>
+                    <small class="text-muted">Preferences & configuration</small>
+                  </div>
+                </button>
+              </li>
+
+              <li><hr class="dropdown-divider"></li>
+
+              <!-- Logout -->
+              <li>
+                <button class="dropdown-item d-flex align-items-center py-2 text-danger" (click)="logout()">
+                  <i class="fa fa-sign-out-alt me-3"></i>
+                  <div>
+                    <div class="fw-medium">Logout</div>
+                    <small class="text-muted">Sign out of your account</small>
+                  </div>
+                </button>
+              </li>
+            </ul>
+          </div>
+        </ng-container>
+        </div>
+      </div>
+    </div>
+  </div>
+</nav>

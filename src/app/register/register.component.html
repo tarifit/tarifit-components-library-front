@@ -1,0 +1,117 @@
+<!-- register.component.html - Pure Bootstrap 5 -->
+<div class="container-fluid">
+  <form (ngSubmit)="register()" #registerForm="ngForm">
+
+    <!-- Username Field -->
+    <div class="mb-3">
+      <label for="regUsername" class="form-label fw-medium">Username:</label>
+      <input type="text"
+             id="regUsername"
+             class="form-control"
+             [class.is-invalid]="usernameField.invalid && (usernameField.dirty || usernameField.touched)"
+             [(ngModel)]="username"
+             name="regUsername"
+             required
+             minlength="3"
+             maxlength="30"
+             placeholder="Enter your username"
+             #usernameField="ngModel">
+      <div class="invalid-feedback" *ngIf="usernameField.invalid && (usernameField.dirty || usernameField.touched)">
+        <div *ngIf="usernameField.errors?.['required']">Username is required.</div>
+        <div *ngIf="usernameField.errors?.['minlength']">Username must be at least 3 characters.</div>
+        <div *ngIf="usernameField.errors?.['maxlength']">Username cannot exceed 30 characters.</div>
+      </div>
+    </div>
+
+    <!-- Email Field -->
+    <div class="mb-3">
+      <label for="regEmail" class="form-label fw-medium">Email:</label>
+      <input type="email"
+             id="regEmail"
+             class="form-control"
+             [class.is-invalid]="emailField.invalid && (emailField.dirty || emailField.touched)"
+             [(ngModel)]="email"
+             name="regEmail"
+             required
+             email
+             placeholder="Enter your email"
+             #emailField="ngModel">
+      <div class="invalid-feedback" *ngIf="emailField.invalid && (emailField.dirty || emailField.touched)">
+        <div *ngIf="emailField.errors?.['required']">Email is required.</div>
+        <div *ngIf="emailField.errors?.['email']">Enter a valid email address.</div>
+      </div>
+    </div>
+
+    <!-- Password Field -->
+    <div class="mb-3">
+      <label for="regPassword" class="form-label fw-medium">Password:</label>
+      <input type="password"
+             id="regPassword"
+             class="form-control"
+             [class.is-invalid]="passwordField.invalid && (passwordField.dirty || passwordField.touched)"
+             [(ngModel)]="password"
+             name="regPassword"
+             required
+             minlength="8"
+             placeholder="Enter your password"
+             #passwordField="ngModel">
+      <div class="invalid-feedback" *ngIf="passwordField.invalid && (passwordField.dirty || passwordField.touched)">
+        <div *ngIf="passwordField.errors?.['required']">Password is required.</div>
+        <div *ngIf="passwordField.errors?.['minlength']">Password must be at least 8 characters.</div>
+      </div>
+    </div>
+
+    <!-- Confirm Password Field -->
+    <div class="mb-3">
+      <label for="confirmPassword" class="form-label fw-medium">Confirm Password:</label>
+      <input type="password"
+             id="confirmPassword"
+             class="form-control"
+             [class.is-invalid]="(confirmPasswordField.invalid && (confirmPasswordField.dirty || confirmPasswordField.touched)) || (password !== confirmPassword && (passwordField.dirty || confirmPasswordField.dirty || passwordField.touched || confirmPasswordField.touched))"
+             [(ngModel)]="confirmPassword"
+             name="confirmPassword"
+             required
+             placeholder="Confirm your password"
+             #confirmPasswordField="ngModel">
+      <div class="invalid-feedback" *ngIf="confirmPasswordField.invalid && (confirmPasswordField.dirty || confirmPasswordField.touched)">
+        <div *ngIf="confirmPasswordField.errors?.['required']">Confirm password is required.</div>
+      </div>
+      <div class="invalid-feedback"
+           *ngIf="password !== confirmPassword && (passwordField.dirty || confirmPasswordField.dirty || passwordField.touched || confirmPasswordField.touched)">
+        Passwords do not match.
+      </div>
+    </div>
+
+    <!-- Submit Button -->
+    <button type="submit"
+            class="btn btn-success w-100 d-flex align-items-center justify-content-center"
+            [disabled]="registerForm.invalid || loading">
+      <span *ngIf="loading" class="spinner-border spinner-border-sm me-2"></span>
+      <span *ngIf="!loading" class="me-2">👤</span>
+      {{ loading ? 'Registering...' : 'Register' }}
+    </button>
+  </form>
+
+  <!-- Success Message -->
+  <div *ngIf="successMessage" class="alert alert-success mt-3 d-flex align-items-center">
+    <i class="fas fa-check-circle me-2"></i>
+    {{ successMessage }}
+  </div>
+
+  <!-- Error Message -->
+  <div *ngIf="errorMessage" class="alert alert-danger mt-3 d-flex align-items-center">
+    <i class="fas fa-exclamation-circle me-2"></i>
+    {{ errorMessage }}
+  </div>
+
+  <!-- Auth Link -->
+  <div class="text-center mt-3">
+    <p class="text-muted">
+      Already have an account?
+      <a href="#" class="text-decoration-none fw-medium" (click)="onSwitchToLogin()">
+        Login here
+      </a>
+    </p>
+  </div>
+
+</div>
